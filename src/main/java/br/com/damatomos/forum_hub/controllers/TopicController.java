@@ -4,6 +4,7 @@ import br.com.damatomos.forum_hub.domain.topics.TopicMapper;
 import br.com.damatomos.forum_hub.domain.topics.TopicRepository;
 import br.com.damatomos.forum_hub.domain.topics.dto.CreateTopicDTO;
 import br.com.damatomos.forum_hub.domain.topics.dto.ResponseTopicDetails;
+import br.com.damatomos.forum_hub.domain.topics.dto.UpdateTopicDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,6 +37,21 @@ public class TopicController {
         var page = topicRepository.findAll(pageable).map(TopicMapper::fromModel);
 
         return ResponseEntity.ok(page);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> update(@PathVariable("id") Long id, @RequestBody @Valid UpdateTopicDTO dto)
+    {
+        if (!topicRepository.existsById(id))
+        {
+            throw new RuntimeException("Não existe tópico com o id informado");
+        }
+
+        var model = TopicMapper.toModel(id, dto);
+
+        topicRepository.save(model);
+
+        return ResponseEntity.ok().build();
     }
 
 }

@@ -3,6 +3,7 @@ package br.com.damatomos.forum_hub.services;
 import br.com.damatomos.forum_hub.domain.exceptions.BadRequestException;
 import br.com.damatomos.forum_hub.domain.exceptions.DuplicateEntityException;
 import br.com.damatomos.forum_hub.domain.exceptions.ForbiddenException;
+import br.com.damatomos.forum_hub.domain.exceptions.NotFoundException;
 import br.com.damatomos.forum_hub.domain.topics.TopicMapper;
 import br.com.damatomos.forum_hub.domain.topics.TopicModel;
 import br.com.damatomos.forum_hub.domain.topics.TopicRepository;
@@ -46,7 +47,7 @@ public class TopicService {
 
         if (topicOptional.isEmpty())
         {
-            throw new EntityNotFoundException("Não existe tópico com esse id");
+            throw new NotFoundException("Não existe tópico com esse id");
         }
 
         var topic = topicOptional.get();
@@ -72,7 +73,7 @@ public class TopicService {
 
         if (topicOptional.isEmpty())
         {
-            throw new EntityNotFoundException("Não existe tópico com esse id");
+            throw new NotFoundException("Não existe tópico com esse id");
         }
 
         var topic = topicOptional.get();
@@ -89,7 +90,7 @@ public class TopicService {
         var topic = this.topicRepository.findById(id);
         if (topic.isEmpty())
         {
-            throw new BadRequestException("O tópico não existe");
+            throw new NotFoundException("O tópico não existe");
         }
 
         return topic.get();

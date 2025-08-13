@@ -39,6 +39,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<String> notFoundException(NotFoundException ex)
+    {
+        return ResponseEntity.notFound().build();
+    }
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<String> badRequestException(BadRequestException ex)
     {

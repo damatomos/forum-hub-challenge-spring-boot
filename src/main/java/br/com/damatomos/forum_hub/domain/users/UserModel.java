@@ -29,5 +29,4 @@ public class UserModel {
 
     @OneToMany(mappedBy = "user")
     private List<TopicModel> topics;
-
 }

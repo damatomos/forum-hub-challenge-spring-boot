@@ -1,9 +1,13 @@
 package br.com.damatomos.forum_hub.services;
 
+import br.com.damatomos.forum_hub.domain.exceptions.BadRequestException;
+import br.com.damatomos.forum_hub.domain.exceptions.DuplicateEntityException;
+import br.com.damatomos.forum_hub.domain.exceptions.ForbiddenException;
 import br.com.damatomos.forum_hub.domain.topics.TopicMapper;
 import br.com.damatomos.forum_hub.domain.topics.TopicModel;
 import br.com.damatomos.forum_hub.domain.topics.TopicRepository;
 import br.com.damatomos.forum_hub.domain.users.UserModel;
+import com.sun.jdi.request.DuplicateRequestException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,9 +21,15 @@ public class TopicService {
     private TopicRepository topicRepository;
 
     public TopicModel create(TopicModel model) {
+
         if (model.getUser() == null)
         {
-            throw new RuntimeException("Nenhum usuário foi identificado para essa operação");
+            throw new ForbiddenException("Usuário sem autorização para fazer a operação");
+        }
+
+        if (topicRepository.existsByTitleAndMessage(model.getTitle(), model.getMessage()))
+        {
+            throw new DuplicateEntityException("Já existe um tópico com esse título e mensagem");
         }
 
         topicRepository.save(model);
@@ -32,7 +42,6 @@ public class TopicService {
     }
 
     public TopicModel update(TopicModel model) {
-
         var topicOptional = topicRepository.findById(model.getId());
 
         if (topicOptional.isEmpty())
@@ -44,7 +53,12 @@ public class TopicService {
 
         if (model.getUser() == null || !topic.getUser().equals(model.getUser()))
         {
-            throw new RuntimeException("Nenhum usuário foi identificado para essa operação");
+            throw new ForbiddenException("Usuário sem autorização para fazer a operação");
+        }
+
+        if (topicRepository.existsByTitleAndMessage(model.getTitle(), model.getMessage()))
+        {
+            throw new DuplicateEntityException("Já existe um tópico com esse título e mensagem");
         }
 
         topicRepository.save(model);
@@ -65,7 +79,7 @@ public class TopicService {
 
         if (!topic.getUser().equals(user))
         {
-            throw new RuntimeException("Nenhum usuário foi identificado para essa operação");
+            throw new ForbiddenException("Usuário sem autorização para fazer a operação");
         }
 
         topicRepository.delete(topic);
@@ -75,7 +89,7 @@ public class TopicService {
         var topic = this.topicRepository.findById(id);
         if (topic.isEmpty())
         {
-            throw new RuntimeException("O tópico não existe");
+            throw new BadRequestException("O tópico não existe");
         }
 
         return topic.get();

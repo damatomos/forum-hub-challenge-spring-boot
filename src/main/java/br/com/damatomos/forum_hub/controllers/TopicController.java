@@ -42,7 +42,7 @@ public class TopicController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ResponseTopicDetails>> findAll(@PageableDefault(size = 10, page = 0, sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable)
+    public ResponseEntity<Page<ResponseTopicDetails>> findAll(@PageableDefault(size = 10, page = 0, sort = {"id"}, direction = Sort.Direction.ASC) Pageable pageable)
     {
         var page = topicService.findAll(pageable).map(TopicMapper::fromModel);
         return ResponseEntity.ok(page);

@@ -1,5 +1,7 @@
 package br.com.damatomos.forum_hub.services;
 
+import br.com.damatomos.forum_hub.domain.exceptions.BadRequestException;
+import br.com.damatomos.forum_hub.domain.exceptions.DuplicateEntityException;
 import br.com.damatomos.forum_hub.domain.users.UserModel;
 import br.com.damatomos.forum_hub.domain.users.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,7 @@ public class UserService {
 
         if (user.isPresent())
         {
-            throw new RuntimeException("Já existe um usuário cadastrado com esse email");
+            throw new DuplicateEntityException("Já existe um usuário cadastrado com esse email");
         }
 
         var hash = passwordEncoder.encode(model.getPassword());
@@ -38,7 +40,7 @@ public class UserService {
 
         if (user.isEmpty())
         {
-            throw new RuntimeException("Não existe usuário com esse email");
+            throw new BadRequestException("Não existe usuário com esse email");
         }
 
         return user.get();

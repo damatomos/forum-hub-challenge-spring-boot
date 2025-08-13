@@ -5,7 +5,9 @@ import br.com.damatomos.forum_hub.domain.topics.TopicRepository;
 import br.com.damatomos.forum_hub.domain.topics.dto.CreateTopicDTO;
 import br.com.damatomos.forum_hub.domain.topics.dto.ResponseTopicDetails;
 import br.com.damatomos.forum_hub.domain.topics.dto.UpdateTopicDTO;
+import br.com.damatomos.forum_hub.domain.users.UserModel;
 import br.com.damatomos.forum_hub.domain.users.UserRepository;
+import br.com.damatomos.forum_hub.services.TopicService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.stream.Collectors;
 
@@ -23,66 +27,43 @@ import java.util.stream.Collectors;
 public class TopicController {
 
     @Autowired
-    private TopicRepository topicRepository;
-
-    @Autowired
-    private UserRepository userRepository;
+    private TopicService topicService;
 
     @PostMapping
-    public ResponseEntity<ResponseTopicDetails> create(@RequestBody @Valid CreateTopicDTO dto)
+    public ResponseEntity<ResponseTopicDetails> create(@RequestBody @Valid CreateTopicDTO dto, ServletUriComponentsBuilder uriBuilder)
     {
-        if (!userRepository.existsById(dto.userId()))
-        {
-            throw new EntityNotFoundException("Não existe usuário com esse id");
-        }
+        var user = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        var user = userRepository.getReferenceById(dto.userId());
+        var topic = topicService.create(TopicMapper.toModel(user, dto));
 
-        var topic = topicRepository.save(TopicMapper.toModel(user, dto));
+        var uri = uriBuilder.path("{id}").buildAndExpand(topic.getId()).toUri();
 
-        return ResponseEntity.ok(TopicMapper.fromModel(topic));
+        return ResponseEntity.created(uri).body(TopicMapper.fromModel(topic));
     }
 
     @GetMapping
     public ResponseEntity<Page<ResponseTopicDetails>> findAll(@PageableDefault(size = 10, page = 0, sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable)
     {
-        var page = topicRepository.findAll(pageable).map(TopicMapper::fromModel);
-
+        var page = topicService.findAll(pageable).map(TopicMapper::fromModel);
         return ResponseEntity.ok(page);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable("id") Long id, @RequestBody @Valid UpdateTopicDTO dto)
+    public ResponseEntity<ResponseTopicDetails> update(@PathVariable("id") Long id, @RequestBody @Valid UpdateTopicDTO dto)
     {
-        if (!topicRepository.existsById(id))
-        {
-            throw new EntityNotFoundException("Não existe tópico com esse id");
-        }
+        var user = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if (!userRepository.existsById(dto.userId()))
-        {
-            throw new EntityNotFoundException("Não existe usuário com esse id");
-        }
+        var topic = this.topicService.update(TopicMapper.toModel(id, user, dto));
 
-        var user = userRepository.getReferenceById(dto.userId());
-
-        var model = TopicMapper.toModel(id, user, dto);
-
-        topicRepository.save(model);
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(TopicMapper.fromModel(topic));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") Long id)
     {
-        if (!topicRepository.existsById(id))
-        {
-            throw new EntityNotFoundException("Não existe tópico com esse id");
-        }
+        var user = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        var topic = topicRepository.getReferenceById(id);
-        topicRepository.delete(topic);
+        this.topicService.delete(id, user);
 
         return ResponseEntity.noContent().build();
     }

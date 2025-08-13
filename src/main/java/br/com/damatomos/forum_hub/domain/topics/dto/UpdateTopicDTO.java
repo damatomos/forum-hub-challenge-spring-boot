@@ -10,9 +10,6 @@ public record UpdateTopicDTO(
         String message,
 
         @NotBlank(message = "O curso deve ser informado")
-        String course,
-
-        @NotBlank(message = "O id do usuário precisa ser informado")
-        Long userId
+        String course
 ) {
 }

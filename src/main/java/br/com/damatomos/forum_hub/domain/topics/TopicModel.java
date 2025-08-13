@@ -2,15 +2,13 @@ package br.com.damatomos.forum_hub.domain.topics;
 
 import br.com.damatomos.forum_hub.domain.users.UserModel;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Table(name = "topics")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name="TopicModel")

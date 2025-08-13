@@ -5,6 +5,7 @@ import br.com.damatomos.forum_hub.domain.topics.TopicRepository;
 import br.com.damatomos.forum_hub.domain.topics.dto.CreateTopicDTO;
 import br.com.damatomos.forum_hub.domain.topics.dto.ResponseTopicDetails;
 import br.com.damatomos.forum_hub.domain.topics.dto.UpdateTopicDTO;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -44,7 +45,7 @@ public class TopicController {
     {
         if (!topicRepository.existsById(id))
         {
-            throw new RuntimeException("Não existe tópico com o id informado");
+            throw new EntityNotFoundException("Não existe tópico com esse id");
         }
 
         var model = TopicMapper.toModel(id, dto);
@@ -52,6 +53,20 @@ public class TopicController {
         topicRepository.save(model);
 
         return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id)
+    {
+        if (!topicRepository.existsById(id))
+        {
+            throw new EntityNotFoundException("Não existe tópico com esse id");
+        }
+
+        var topic = topicRepository.getReferenceById(id);
+        topicRepository.delete(topic);
+
+        return ResponseEntity.noContent().build();
     }
 
 }

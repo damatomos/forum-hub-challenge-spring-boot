@@ -2,7 +2,9 @@ CREATE TABLE topics (
     id BIGINT NOT NULL AUTO_INCREMENT,
     title VARCHAR(150) NOT NULL,
     message TEXT NOT NULL,
+    course VARCHAR(100) NOT NULL,
     status TINYINT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id)
 );

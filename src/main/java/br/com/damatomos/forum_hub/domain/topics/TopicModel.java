@@ -26,6 +26,8 @@ public class TopicModel {
 
     private Boolean status;
 
+    private String course;
+
     // TODO: Add author (UserModel)
     // TODO: Add course (CourseModel)
     // TODO: Add Responses (ResponseModel)

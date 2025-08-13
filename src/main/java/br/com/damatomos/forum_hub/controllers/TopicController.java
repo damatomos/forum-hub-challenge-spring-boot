@@ -1,14 +1,11 @@
 package br.com.damatomos.forum_hub.controllers;
 
 import br.com.damatomos.forum_hub.domain.topics.TopicMapper;
-import br.com.damatomos.forum_hub.domain.topics.TopicRepository;
 import br.com.damatomos.forum_hub.domain.topics.dto.CreateTopicDTO;
 import br.com.damatomos.forum_hub.domain.topics.dto.ResponseTopicDetails;
 import br.com.damatomos.forum_hub.domain.topics.dto.UpdateTopicDTO;
 import br.com.damatomos.forum_hub.domain.users.UserModel;
-import br.com.damatomos.forum_hub.domain.users.UserRepository;
 import br.com.damatomos.forum_hub.services.TopicService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,8 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/topics")
@@ -39,6 +34,13 @@ public class TopicController {
         var uri = uriBuilder.path("{id}").buildAndExpand(topic.getId()).toUri();
 
         return ResponseEntity.created(uri).body(TopicMapper.fromModel(topic));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseTopicDetails> findOne(@PathVariable("id") Long id)
+    {
+        var topic = topicService.findById(id);
+        return ResponseEntity.ok(TopicMapper.fromModel(topic));
     }
 
     @GetMapping

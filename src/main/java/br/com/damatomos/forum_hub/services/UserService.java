@@ -1,6 +1,5 @@
 package br.com.damatomos.forum_hub.services;
 
-import br.com.damatomos.forum_hub.domain.users.UserMapper;
 import br.com.damatomos.forum_hub.domain.users.UserModel;
 import br.com.damatomos.forum_hub.domain.users.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

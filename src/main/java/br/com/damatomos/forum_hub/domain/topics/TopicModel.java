@@ -1,5 +1,6 @@
 package br.com.damatomos.forum_hub.domain.topics;
 
+import br.com.damatomos.forum_hub.domain.users.UserModel;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -29,6 +30,10 @@ public class TopicModel {
     private String course;
 
     // TODO: Add author (UserModel)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserModel user;
     // TODO: Add course (CourseModel)
     // TODO: Add Responses (ResponseModel)
 

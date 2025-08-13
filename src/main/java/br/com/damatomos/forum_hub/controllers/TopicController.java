@@ -5,6 +5,7 @@ import br.com.damatomos.forum_hub.domain.topics.TopicRepository;
 import br.com.damatomos.forum_hub.domain.topics.dto.CreateTopicDTO;
 import br.com.damatomos.forum_hub.domain.topics.dto.ResponseTopicDetails;
 import br.com.damatomos.forum_hub.domain.topics.dto.UpdateTopicDTO;
+import br.com.damatomos.forum_hub.domain.users.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +25,20 @@ public class TopicController {
     @Autowired
     private TopicRepository topicRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @PostMapping
     public ResponseEntity<ResponseTopicDetails> create(@RequestBody @Valid CreateTopicDTO dto)
     {
-        var topic = topicRepository.save(TopicMapper.toModel(dto));
+        if (!userRepository.existsById(dto.userId()))
+        {
+            throw new EntityNotFoundException("Não existe usuário com esse id");
+        }
+
+        var user = userRepository.getReferenceById(dto.userId());
+
+        var topic = topicRepository.save(TopicMapper.toModel(user, dto));
 
         return ResponseEntity.ok(TopicMapper.fromModel(topic));
     }
@@ -48,7 +59,14 @@ public class TopicController {
             throw new EntityNotFoundException("Não existe tópico com esse id");
         }
 
-        var model = TopicMapper.toModel(id, dto);
+        if (!userRepository.existsById(dto.userId()))
+        {
+            throw new EntityNotFoundException("Não existe usuário com esse id");
+        }
+
+        var user = userRepository.getReferenceById(dto.userId());
+
+        var model = TopicMapper.toModel(id, user, dto);
 
         topicRepository.save(model);
 
